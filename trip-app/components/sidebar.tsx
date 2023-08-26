@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Montserrat } from "next/font/google";
 import { cn } from "@/lib/utils";
-
+import { usePathname } from "next/navigation";
 import React from "react";
 import {
   Code,
@@ -56,10 +56,12 @@ const routes = [
     label: "Settings",
     icon: Settings,
     href: "/settings",
-    color: "text-sky-500",
+    color: "text-blue-500",
   },
 ];
 const Sidebar = () => {
+  const pathname = usePathname();
+
   return (
     <div className=" space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
       <div className="px-3 py-2 flex-1">
@@ -78,7 +80,9 @@ const Sidebar = () => {
               key={route.href}
               href={route.href}
               className={cn(
-                "flex flex-1  items-center space-x-3 p-2 rounded-md hover:text-white hover:bg-white/10 rounded-transition"
+                `flex flex-1  items-center ${
+                  route.href == pathname ? "bg-[#18243d]" : ""
+                }  space-x-3 p-2 rounded-md hover:text-white hover:bg-white/10 rounded-transition`
               )}
             >
               <div className="flex items-center p-2 space-x-3 rounded-md">
