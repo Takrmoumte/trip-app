@@ -1,7 +1,7 @@
 "use client";
 import * as z from "zod";
 import Heading from "@/components/heading";
-import React from "react";
+import React, { use } from "react";
 import { MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
@@ -10,18 +10,47 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import axios from "axios";
+import { Empty } from "@/components/ui/Empty";
+import { Loader } from "@/components/loader";
+import { UserAvatar } from "@/components/user-avatar";
+import { BotAvatar } from "@/components/bot-avatar";
 
 const ConversationPage = () => {
+  const router = useRouter();
+  const [messages, setMessages] = useState<any[]>([]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: "",
     },
   });
-
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    try {
+      const userMessage = {
+        role: "user",
+        content: values.prompt,
+      };
+      const newMessages = [...messages, userMessage];
+      const response = await axios.post("/api/conversation", {
+        messages: newMessages,
+      });
+      console.log("responsess ", response.data);
+
+      setMessages((current) => [...current, userMessage, response.data]);
+
+      console.log("MSGS ", messages);
+
+      form.reset();
+    } catch (error: any) {
+      //TODO: Open Pro Modal
+      console.log(error);
+    } finally {
+      router.refresh();
+    }
   };
 
   return (
@@ -49,7 +78,7 @@ const ConversationPage = () => {
                       placeholder="Ask me anything"
                       disabled={isLoading}
                       {...field}
-                    ></Input>
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -62,6 +91,32 @@ const ConversationPage = () => {
             </Button>
           </form>
         </Form>
+      </div>
+      <div className="space-y-4 mt-4">
+        {isLoading && (
+          <div className="p-8 rounded-lg w-full flex items-center justify-center bg muted">
+            <Loader label="Attends Attends c'est pas fini" />
+          </div>
+        )}
+        {messages.length === 0 && !isLoading && (
+          <Empty label="No messages yet" />
+        )}
+        <div className="flex flex-col-reverse gap-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.content}
+              className={cn(
+                "p-8 w-full flex item-start gap-x-8 rounded-lg",
+                message.role === "user"
+                  ? "bg-white border border-black/10"
+                  : "bg-muted"
+              )}
+            >
+              {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
+              {message.content}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
