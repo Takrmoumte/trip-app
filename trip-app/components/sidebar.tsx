@@ -30,25 +30,25 @@ const routes = [
   {
     label: "Image Generation ",
     icon: ImageIcon,
-    href: "/images",
+    href: "/images-generation",
     color: "text-pink-700",
   },
   {
     label: "Video Generation",
     icon: VideoIcon,
-    href: "/videos",
+    href: "/videos-generation",
     color: "text-orange-700",
   },
   {
     label: "Music Generation",
     icon: Music,
-    href: "/music",
+    href: "/music-generation",
     color: "text-emerald-500",
   },
   {
     label: "Code Generation",
     icon: Code,
-    href: "/code",
+    href: "/code-generation",
     color: "text-green-700",
   },
 
